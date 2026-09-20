@@ -1,0 +1,10 @@
+[package]
+name = "tui-piano"
+version = "0.1.0"
+edition = "2021"
+default-run = "tui-piano"
+
+[dependencies]
+ratatui = "0.30"
+crossterm = "0.29"
+rodio = { version = "0.22", default-features = false, features = ["playback"] }
