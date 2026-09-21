@@ -1,4 +1,6 @@
 //! 音符計算とキーマッピング（純粋関数集）
+//!
+//! shift: 基準音の半音オフセット。0=C(ド両端), 4=E(ミ両端)
 
 /// キー文字 → 基準Cからの半音オフセット（基準C = MIDI 12*(octave+1)）
 ///
@@ -48,12 +50,12 @@ pub fn note_name(midi: i32) -> String {
     format!("{name}{octave}")
 }
 
-/// キー文字と現在の基準オクターブから MIDI ノート番号を計算。
+/// キー文字・基準オクターブ・基準音シフト(半音)から MIDI ノート番号を計算。
 /// キーが KEYMAP に無ければ None。
-pub fn midi_for_key(key: char, octave: i32) -> Option<i32> {
+pub fn midi_for_key(key: char, octave: i32, shift: i32) -> Option<i32> {
     let offset = KEYMAP
         .iter()
         .find(|(c, _)| *c == key)
         .map(|(_, off)| *off)?;
-    Some(12 * (octave + 1) + offset)
+    Some(12 * (octave + 1) + shift + offset)
 }

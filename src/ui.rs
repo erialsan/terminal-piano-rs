@@ -88,6 +88,7 @@ fn key_section(
     black: &[(char, u8)],
     white: &[(char, i32)],
     octave: i32,
+    shift: i32,
     h: usize,
     w: usize,
     width: usize,
@@ -98,7 +99,7 @@ fn key_section(
     let label_row = (black_h + 1).min(h - 1); // 白鍵ラベル行
     let name_row = h - 1; // 音名行
     let cap_w = (w * 3 / 5).max(3).min(w); // 黒鍵幅 = 白鍵の約60%
-    let base = 12 * (octave + 1);
+    let base = 12 * (octave + 1) + shift;
 
     (0..h)
         .map(|r| {
@@ -213,9 +214,15 @@ pub fn draw(frame: &mut Frame, state: &AppState) {
         Span::raw("Octave: "),
         Span::styled(state.octave.to_string(), accent),
         Span::styled(
-            format!(" (C{}–C{})", state.octave, state.octave + 2),
+            format!(
+                " ({}–{})",
+                piano::note_name(12 * (state.octave + 1) + state.key_shift),
+                piano::note_name(12 * (state.octave + 1) + state.key_shift + 24)
+            ),
             dim,
         ),
+        Span::raw("   基準: "),
+        Span::styled(if state.key_shift == 0 { "C" } else { "E" }, accent),
         Span::raw("   Last: "),
     ];
     header_spans.extend(last_spans);
@@ -223,7 +230,7 @@ pub fn draw(frame: &mut Frame, state: &AppState) {
     header_spans.push(Span::styled(sound, sound_style));
     let header = Line::from(header_spans);
     let footer = Line::from(Span::styled(
-        "Q–I=高 Z–,=低  ←/→ オクターブ  Esc 終了",
+        "Q–I=高 Z–,=低  ←/→ オクターブ  Tab 基準C⇔E  Esc 終了",
         dim,
     ));
 
@@ -238,6 +245,7 @@ pub fn draw(frame: &mut Frame, state: &AppState) {
         piano::UPPER_BLACK,
         piano::UPPER_WHITE,
         state.octave,
+        state.key_shift,
         sh,
         w,
         width,
@@ -248,6 +256,7 @@ pub fn draw(frame: &mut Frame, state: &AppState) {
         piano::LOWER_BLACK,
         piano::LOWER_WHITE,
         state.octave,
+        state.key_shift,
         sh,
         w,
         width,

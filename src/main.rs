@@ -20,6 +20,8 @@ const FLASH: Duration = Duration::from_millis(150);
 pub struct AppState {
     /// 基準オクターブ（クランプ 1..=6）
     pub octave: i32,
+    /// 基準音シフト(半音)。0=C(ド両端) / 4=E(ミ両端)、Tab でトグル
+    pub key_shift: i32,
     /// 反転表示用: キー → 押下時刻
     pub pressed: HashMap<char, Instant>,
     /// 長押し中のノート（kitty 拡張対応端末のみ）
@@ -36,6 +38,7 @@ impl AppState {
     fn new(enhanced: bool) -> Self {
         Self {
             octave: 4,
+            key_shift: 0,
             pressed: HashMap::new(),
             held: HashMap::new(),
             last_note: None,
@@ -127,6 +130,9 @@ fn run_loop(
                         KeyCode::Left if key.kind != KeyEventKind::Release => {
                             state.octave = (state.octave - 1).max(1)
                         }
+                        KeyCode::Tab if key.kind != KeyEventKind::Release => {
+                            state.key_shift = if state.key_shift == 0 { 4 } else { 0 };
+                        }
                         KeyCode::Char(c) => {
                             let c = c.to_ascii_lowercase();
                             match (state.enhanced, key.kind) {
@@ -149,8 +155,10 @@ fn run_loop(
                                         // 重複 Press（念のため）
                                         continue;
                                     }
-                                    if let Some(midi) = piano::midi_for_key(c, state.octave) {
-                                        let midi = midi as u8; // 上限: 12*7 + 25 = 109 < 128、安全
+                                    if let Some(midi) =
+                                        piano::midi_for_key(c, state.octave, state.key_shift)
+                                    {
+                                        let midi = midi as u8; // 上限: 12*7 + 4 + 25 = 113 < 128、安全
                                         if let Some(audio) = state.audio.as_mut() {
                                             if enhanced_press {
                                                 let h = audio.note_on_hold(midi);
