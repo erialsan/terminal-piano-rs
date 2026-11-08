@@ -7,4 +7,4 @@ default-run = "tui-piano"
 [dependencies]
 ratatui = "0.30"
 crossterm = "0.29"
-rodio = { version = "0.22", default-features = false, features = ["playback"] }
+rodio = { version = "0.23", default-features = false, features = ["playback"] }
