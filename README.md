@@ -21,6 +21,14 @@ A virtual piano for the terminal, written in Rust. The keyboard layout follows V
 - An audio output device, optional.
 - For hold-to-sustain, a terminal that supports the kitty keyboard protocol, such as ghostty. Everything else works in any terminal.
 
+## Development with Nix
+
+The flake exposes the environment defined in `devenv.nix`:
+
+```sh
+nix develop --impure
+```
+
 ## Usage
 
 ```sh
