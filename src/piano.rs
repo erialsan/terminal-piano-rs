@@ -59,3 +59,13 @@ pub fn midi_for_key(key: char, octave: i32, shift: i32) -> Option<i32> {
         .map(|(_, off)| *off)?;
     Some(12 * (octave + 1) + shift + offset)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::midi_for_key;
+
+    #[test]
+    fn lower_row_starts_at_e4_in_e_layout() {
+        assert_eq!(midi_for_key('z', 4, 4), Some(64));
+    }
+}

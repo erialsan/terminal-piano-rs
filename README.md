@@ -17,22 +17,23 @@ A virtual piano for the terminal, written in Rust. The keyboard layout follows V
 
 ## Requirements
 
-- A Rust toolchain (edition 2021).
+- Nix with flakes enabled for the commands below.
 - An audio output device, optional.
 - For hold-to-sustain, a terminal that supports the kitty keyboard protocol, such as ghostty. Everything else works in any terminal.
 
 ## Development with Nix
 
-The flake exposes the environment defined in `devenv.nix`:
+The flake pins the Rust toolchain and supplies native dependencies. Cargo still declares crates in `Cargo.toml` and pins them in `Cargo.lock`, which Nix uses to fetch the same versions without a second dependency list.
 
 ```sh
-nix develop --impure
+nix develop -c cargo test --locked  # Run tests during development
+nix flake check                   # Build and test as in CI
 ```
 
 ## Usage
 
 ```sh
-cargo run --release
+nix run
 ```
 
 ## Key bindings
