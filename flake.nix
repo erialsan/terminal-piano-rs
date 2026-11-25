@@ -10,8 +10,11 @@
           (system: f (import nixpkgs { inherit system; }) system);
       manifest = (builtins.fromTOML (builtins.readFile ./Cargo.toml)).package;
       nativeDeps = pkgs: {
-        nativeBuildInputs = [ pkgs.pkg-config ];
+        nativeBuildInputs = [ pkgs.pkg-config ]
+          ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.mold ];
         buildInputs = pkgs.lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.alsa-lib ];
+      } // pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+        RUSTFLAGS = "-C link-arg=-B${pkgs.mold}/bin -C link-arg=-fuse-ld=mold";
       };
     in {
       devShells = forAllSystems (pkgs: _: {
